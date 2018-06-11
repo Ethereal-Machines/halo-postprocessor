@@ -1,8 +1,8 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3.6.4
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
-# Copyright (C) 2018 Ethereal Machines Pvt. Ltd
-# Distributed under terms of the MIT license. All rights reserved license.
+# Copyright (C) 2018 Ethereal Machines Pvt. Ltd. All rights reserved.
+# Distributed under terms of the MIT license. 
 
 __author__ = 'Toran Sahu <toran.sahu@yahoo.com>'
 __version__ = '1.18.05.04'
@@ -10,6 +10,8 @@ __version__ = '1.18.05.04'
 """
 Halo Postprocessor.
 """
+
+# TODO: browse only .gcodes, add publisher info
 
 import os
 import sys
@@ -25,6 +27,9 @@ file_path = askopenfilename()
 if file_path is None or not file_path:
     logger.warning('File not selected.')
     sys.exit('Exiting..')
+elif os.path.splitext(file_path)[1].lower() != '.gcode':
+    logger.warning('Unsupported file.')
+    sys.exit('Unsupported file. Exiting..')
 
 count = 1
 
@@ -55,7 +60,7 @@ if len(similar_files) > 0:
 
 with open(file_path, 'r') as r_stream, open(output, 'w') as w_stream:
     w_stream.write("%\n")
-    w_stream.write("M101 Q170")
+    w_stream.write("M100 P170")
 
     for datum in r_stream:
         if ';' not in datum and 'M' not in datum:
