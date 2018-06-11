@@ -1,11 +1,11 @@
-#! /usr/bin/env python3.6.4
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim:fenc=utf-8
 # Copyright (C) 2018 Ethereal Machines Pvt. Ltd. All rights reserved.
 # Distributed under terms of the MIT license. 
 
 __author__ = 'Toran Sahu <toran.sahu@yahoo.com>'
-__version__ = '1.18.05.04'
+__version__ = '1.18.06.11'
 
 """
 Halo Postprocessor.
@@ -22,7 +22,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-file_path = askopenfilename()
+file_path = askopenfilename(initialdir="./", title="Select file", filetypes=(("gcode files", "*.gcode"),("all files", "*.*")))
 
 if file_path is None or not file_path:
     logger.warning('File not selected.')
@@ -35,10 +35,11 @@ count = 1
 
 parent_dir, filename = os.path.split(file_path)
 name, ext = os.path.splitext(filename)
-
 similar_files = []
 
-regex = '(?s:square\-eth\-[0-9]+\.nc)\Z'
+regex = re.escape(filename) + r'\-eth\-[0-9]+\.nc\Z'
+
+regex = r'(?s:' + re.escape(name) + r'-eth\-[0-9]+\.nc)\Z'
 re_obj = re.compile(regex)
 
 for file in os.listdir(parent_dir, ):
@@ -49,14 +50,11 @@ output = None
 
 if len(similar_files) > 0:
     logger.info('Similar output files found.')
-
     max_file_count = max(map(lambda f: int((f.rsplit('-eth-', 1)[1]).rsplit('.',1)[0]), similar_files))
-
-    if not os.path.isfile(os.path.join(parent_dir, name) + f'-eth-{count}.nc'):
-        output = os.path.join(parent_dir, name) + f'-eth-{count}.nc'
-    else:
-        count = max_file_count + 1
-        output = os.path.join(parent_dir, name) + f'-eth-{count}.nc'
+    count = max_file_count + 1
+    output = os.path.join(parent_dir, name) + f'-eth-{count}.nc'
+else:
+    output = os.path.join(parent_dir, name) + f'-eth-{count}.nc'
 
 with open(file_path, 'r') as r_stream, open(output, 'w') as w_stream:
     w_stream.write("%\n")
