@@ -11,7 +11,8 @@ __version__ = '1.18.06.11'
 Halo Postprocessor.
 """
 
-# TODO: browse only .gcodes, add publisher info
+# TODO: add publisher info in exe
+# TODO: beautify window
 
 import os
 import sys
