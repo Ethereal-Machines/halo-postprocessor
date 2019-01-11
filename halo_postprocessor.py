@@ -24,6 +24,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 file_path = askopenfilename(initialdir="./", title="Select file", filetypes=(("gcode files", "*.gcode"),("all files", "*.*")))
+# file_path = "CFFFP_bridging_test.gcode"
 
 if file_path is None or not file_path:
     logger.warning('File not selected.')
@@ -59,12 +60,16 @@ else:
 
 with open(file_path, 'r') as r_stream, open(output, 'w') as w_stream:
     w_stream.write("%\n")
-    w_stream.write("M100 P170")
+    # w_stream.write("M100 P170")
 
     for datum in r_stream:
-        if ';' not in datum and 'M' not in datum:
-            w_stream.write(datum.replace('A', 'U'))
-
+        if ";" not in datum:
+            datum = datum.replace('E', 'B').replace('M104 S', 'M100 P')
+            if "M" in datum and all(i not in datum for i in ["M100", "M9", "M30"]):
+                pass
+            else:
+                w_stream.write(datum)
+            
     w_stream.write("M9\n")
     w_stream.write("M30\n")
     w_stream.write("%\n")
